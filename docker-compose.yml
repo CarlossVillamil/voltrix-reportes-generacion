@@ -1,0 +1,48 @@
+services:
+  db-reportes:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      POSTGRES_DB: reportes
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command: >
+      postgres -c shared_buffers=48MB -c effective_cache_size=128MB
+               -c work_mem=2MB -c maintenance_work_mem=16MB -c max_connections=20
+    volumes:
+      - pgdata-reportes:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d reportes"]
+      interval: 10s
+      retries: 5
+    networks: [voltrix-reportes-net]
+    # sin seccion ports: la base de datos no se publica fuera de la red
+ 
+  api-reportes:
+    build: .
+    restart: unless-stopped
+    mem_limit: 448m
+    ports:
+      - "8080:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db-reportes:5432/reportes
+      INVENTARIO_URL: ${INVENTARIO_URL}
+      TELEMETRIA_URL: ${TELEMETRIA_URL}
+      MAX_WORKERS: "2"
+    depends_on:
+      db-reportes:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      retries: 3
+    networks: [voltrix-reportes-net]
+ 
+networks:
+  voltrix-reportes-net:
+    driver: bridge
+ 
+volumes:
+  pgdata-reportes:

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contrato OpenAPI · Equipo 4 · Reportes de Generación</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+  <style>
+    body { margin: 0; background: #fafafa; font-family: "Segoe UI", Arial, sans-serif; }
+    .encabezado {
+      background: #1f3a5f; color: #fff; padding: 18px 24px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .encabezado h1 { margin: 0; font-size: 20px; font-weight: 600; }
+    .encabezado p { margin: 4px 0 0; font-size: 14px; opacity: .85; }
+    .encabezado a {
+      color: #1f3a5f; background: #fff; text-decoration: none; font-size: 14px; font-weight: 600;
+      padding: 8px 14px; border-radius: 4px; white-space: nowrap;
+    }
+    .swagger-ui .topbar { display: none; }
+  </style>
+</head>
+<body>
+  <header class="encabezado">
+    <div>
+      <h1>Voltrix Energy · Equipo 4 · Reportes de Generación</h1>
+      <p>Contrato OpenAPI del servicio, basado en la plantilla común de los equipos.</p>
+    </div>
+    <a href="openapi.yaml" download>Descargar openapi.yaml</a>
+  </header>
+
+  <div id="swagger-ui"></div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js" crossorigin></script>
+  <script>
+    window.onload = function () {
+      SwaggerUIBundle({
+        url: "openapi.yaml",
+        dom_id: "#swagger-ui",
+        deepLinking: true,
+        docExpansion: "list",
+        defaultModelsExpandDepth: 0,
+        // Solo documentación: el servicio corre en EC2 por HTTP y no se prueba desde esta página.
+        supportedSubmitMethods: []
+      });
+    };
+  </script>
+</body>
+</html>
