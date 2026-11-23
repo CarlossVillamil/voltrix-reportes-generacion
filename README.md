@@ -68,7 +68,7 @@ index.html        página del contrato publicada en GitHub Pages
 
 ## Ejecución local
 
-> El código de la API está en desarrollo. Estos pasos aplicarán cuando estén listos el `Dockerfile` y `db/init.sql`.
+> Estado del Avance 1: los cuatro endpoints responden según el contrato. `POST /reportes/generar` registra la ejecución, pero todavía no calcula (devuelve `generados: 0`); el Map-Reduce y los clientes de los Equipos 1 y 2 llegan en el Avance 2.
 
 1. Crear un archivo `.env` en la raíz con estas variables (no se sube al repositorio):
 
@@ -85,13 +85,31 @@ index.html        página del contrato publicada en GitHub Pages
    docker compose up -d --build
    ```
 
-3. Comprobar que responde:
+3. Cargar los datos de ejemplo (se puede repetir, no duplica filas):
+
+   ```
+   docker compose exec -T db-reportes sh -c 'psql -U "$POSTGRES_USER" -d reportes' < db/datos_ejemplo.sql
+   ```
+
+4. Comprobar que responde:
 
    ```
    curl http://localhost:8080/health
+   curl "http://localhost:8080/reportes/generacion?plantaId=PL-001&limit=5" -H "X-Equipo-Consumidor: equipo-5"
    ```
 
 La API queda publicada en el puerto **8080**. La base de datos no publica puertos: solo se puede llegar a ella desde la red interna `voltrix-reportes-net`.
+
+## Pruebas
+
+```
+python -m venv .venv
+.venv\Scripts\activate          # en Linux/macOS: source .venv/bin/activate
+pip install -r requirements-dev.txt
+python -m pytest
+```
+
+`tests/test_api.py` no necesita base de datos. `tests/test_repositorios.py` se omite si no está definida `TEST_DATABASE_URL` (ver el encabezado del archivo).
 
 ## Ver el contrato en local
 
