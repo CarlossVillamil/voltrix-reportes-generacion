@@ -6,6 +6,8 @@ import logging
 
 from fastapi import FastAPI
 
+from app.api.errores import registrar_manejadores
+from app.api.middleware import registrar_middleware
 from app.config import config
 
 logging.basicConfig(
@@ -24,6 +26,8 @@ def crear_app() -> FastAPI:
         redoc_url=None,
         openapi_url=None,
     )
+    registrar_manejadores(app)
+    registrar_middleware(app)
     return app
 
 
