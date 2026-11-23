@@ -6,6 +6,7 @@ import logging
 
 from fastapi import FastAPI
 
+from app.api import routes_operacion, routes_reportes
 from app.api.errores import registrar_manejadores
 from app.api.middleware import registrar_middleware
 from app.config import config
@@ -28,6 +29,8 @@ def crear_app() -> FastAPI:
     )
     registrar_manejadores(app)
     registrar_middleware(app)
+    app.include_router(routes_reportes.router)
+    app.include_router(routes_operacion.router)
     return app
 
 
