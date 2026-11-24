@@ -1,0 +1,19 @@
+Fecha: lun 23/11/2026 23:55:39,73
+
+> aws eks list-clusters --profile floci
+{
+    "clusters": [
+        "voltrix-reportes"
+    ]
+}
+
+> aws eks describe-cluster --name voltrix-reportes --profile floci
+-----------------------------------------------------------------
+|                        DescribeCluster                        |
++----------+----------------------------------------------------+
+|  Endpoint|  https://localhost:6500                            |
+|  Estado  |  ACTIVE                                            |
+|  Nombre  |  voltrix-reportes                                  |
+|  Rol     |  arn:aws:iam::000000000000:role/eks-cluster-role   |
+|  Version |  1.29                                              |
++----------+----------------------------------------------------+

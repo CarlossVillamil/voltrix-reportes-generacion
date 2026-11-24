@@ -1,0 +1,7 @@
+# Copiar como terraform.tfvars y poner las IP del equipo
+# La IP se ve en https://checkip.amazonaws.com
+cidrs_ssh = [
+  "203.0.113.10/32", # reemplazar
+]
+
+# usar_ip_elastica = true

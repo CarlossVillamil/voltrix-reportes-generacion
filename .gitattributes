@@ -1,0 +1,6 @@
+# Scripts de Linux siempre con LF (la EC2 no ejecuta archivos con CRLF)
+*.sh text eol=lf
+*.tftpl text eol=lf
+
+# Scripts de Windows con CRLF
+*.cmd text eol=crlf
