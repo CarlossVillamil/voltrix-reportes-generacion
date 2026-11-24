@@ -25,14 +25,14 @@ locals {
   }
 }
 
-# Ubuntu 24.04 oficial de Canonical
+# Ubuntu 26.04 oficial de Canonical (la misma de la EC2 actual)
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-amd64-server-*"]
   }
 
   filter {
