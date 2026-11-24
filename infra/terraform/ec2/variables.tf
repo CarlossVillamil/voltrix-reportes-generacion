@@ -5,14 +5,14 @@ variable "region" {
   default     = "us-east-2"
 }
 
-# Confirmar con Sebastian
+# Igual a la EC2 actual
 variable "tipo_instancia" {
   description = "Tipo de instancia (1 GiB de RAM)"
   type        = string
   default     = "t3.micro"
 }
 
-# Confirmar con Sebastian
+# Key pair confirmado por Sebastian
 variable "nombre_llave" {
   description = "Key pair de AWS"
   type        = string
@@ -33,7 +33,7 @@ variable "swap_mb" {
 variable "disco_gb" {
   description = "Disco raiz en GiB"
   type        = number
-  default     = 16
+  default     = 20
 }
 
 variable "repo_url" {
