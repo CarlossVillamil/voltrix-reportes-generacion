@@ -1,0 +1,9 @@
+Fecha: lun 23/11/2026 23:55:39,30
+
+> docker compose -f floci\docker-compose.yml ps
+NAME      IMAGE                COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+floci     floci/floci:latest   "/usr/local/bin/dock…"   floci     15 minutes ago   Up 15 minutes (healthy)   0.0.0.0:4566->4566/tcp, [::]:4566->4566/tcp
+
+> docker ps --filter "ancestor=rancher/k3s:latest"
+NAMES                            IMAGE          STATUS          PORTS
+floci-aws-eks-voltrix-reportes   5e0707cfd123   Up 14 minutes   0.0.0.0:6500->6443/tcp, [::]:6500->6443/tcp

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Primer arranque de la EC2. El .env se copia a mano
+set -euxo pipefail
+
+# Swap de 1 GiB (la instancia solo tiene 1 GiB de RAM)
+if [ ! -f /swapfile ]; then
+  fallocate -l ${swap_mb}M /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+echo 'vm.swappiness=10' > /etc/sysctl.d/99-voltrix-swap.conf
+sysctl --system
+
+# Instalar Docker y compose
+apt-get update
+apt-get install -y docker.io docker-compose-v2 git
+systemctl enable --now docker
+usermod -aG docker ubuntu
+
+# Clonar el repo
+if [ ! -d /home/ubuntu/voltrix-reportes-generacion ]; then
+  sudo -u ubuntu git clone ${repo_url} /home/ubuntu/voltrix-reportes-generacion
+fi

@@ -3,3 +3,19 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+
+# Llaves y documentos internos del equipo (nunca al repositorio)
+*.pem
+*.ppk
+Equipo 4 – Checklist de tareas.pdf
+
+# Floci (estado local del emulador y llave de kubectl)
+infra/floci/data/
+infra/floci/llave-k8s.txt
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log

@@ -1,0 +1,7 @@
+Fecha: lun 23/11/2026 23:55:37,96
+
+> docker info --format "{{.OperatingSystem}} ^| {{.OSType}}"
+Docker Desktop | linux
+
+> docker info --format "{{.SecurityOptions}}"
+[name=seccomp,profile=builtin name=cgroupns]

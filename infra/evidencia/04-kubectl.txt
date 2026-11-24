@@ -1,0 +1,13 @@
+Fecha: lun 23/11/2026 23:55:42,40
+
+> kubectl config current-context
+floci-voltrix-reportes
+
+> kubectl get nodes -o wide
+NAME                               STATUS   ROLES           AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE           KERNEL-VERSION                     CONTAINER-RUNTIME
+i-517f15ad63d335709.ec2.internal   Ready    control-plane   14m   v1.34.1+k3s1   172.17.0.3    <none>        K3s v1.34.1+k3s1   6.6.87.2-microsoft-standard-WSL2   containerd://2.1.4-k3s2
+
+> kubectl get pods -A
+NAMESPACE     NAME                              READY   STATUS    RESTARTS   AGE
+kube-system   coredns-7896679cc-7w86z           1/1     Running   0          14m
+kube-system   metrics-server-7b9c9c4b9c-tbbcm   1/1     Running   0          14m
