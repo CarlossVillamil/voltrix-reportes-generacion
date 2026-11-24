@@ -18,6 +18,18 @@ def _entero(nombre: str, por_defecto: int) -> int:
     return int(valor) if valor else por_defecto
 
 
+def _decimal(nombre: str, por_defecto: float) -> float:
+    valor = os.getenv(nombre)
+    return float(valor) if valor else por_defecto
+
+
+def _booleano(nombre: str, por_defecto: bool = False) -> bool:
+    valor = os.getenv(nombre)
+    if valor is None or not valor.strip():
+        return por_defecto
+    return valor.strip().lower() in {"1", "true", "yes", "si", "sí", "on"}
+
+
 @dataclass(frozen=True)
 class Configuracion:
     version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.0"))
@@ -29,6 +41,13 @@ class Configuracion:
     # Servicios de otros equipos (los usan los clientes de app/services)
     inventario_url: str | None = field(default_factory=lambda: os.getenv("INVENTARIO_URL") or None)
     telemetria_url: str | None = field(default_factory=lambda: os.getenv("TELEMETRIA_URL") or None)
+
+    # MODO_SIMULADO=true: los clientes devuelven datos sintéticos y no hacen ninguna llamada HTTP.
+    # Sirve para trabajar mientras los Equipos 1 y 2 no tienen su servicio disponible.
+    modo_simulado: bool = field(default_factory=lambda: _booleano("MODO_SIMULADO"))
+    # Tiempo máximo (segundos) de cada llamada a otro equipo y reintentos de conexión
+    timeout_clientes_s: float = field(default_factory=lambda: _decimal("CLIENTES_TIMEOUT_S", 10.0))
+    reintentos_clientes: int = field(default_factory=lambda: _entero("CLIENTES_REINTENTOS", 2))
 
     # Procesamiento: en EC2 (1 GiB) docker-compose fija MAX_WORKERS=2
     max_workers: int = field(default_factory=lambda: _entero("MAX_WORKERS", os.cpu_count() or 1))

@@ -28,8 +28,9 @@ services:
       - "8080:8000"
     environment:
       DATABASE_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db-reportes:5432/reportes
-      INVENTARIO_URL: ${INVENTARIO_URL}
-      TELEMETRIA_URL: ${TELEMETRIA_URL}
+      INVENTARIO_URL: ${INVENTARIO_URL:-}
+      TELEMETRIA_URL: ${TELEMETRIA_URL:-}
+      MODO_SIMULADO: ${MODO_SIMULADO:-false}
       MAX_WORKERS: "2"
     depends_on:
       db-reportes:
