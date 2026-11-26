@@ -77,6 +77,7 @@ index.html        página del contrato publicada en GitHub Pages
    DB_PASSWORD=<contraseña>
    INVENTARIO_URL=http://<host-equipo-1>:<puerto>
    TELEMETRIA_URL=http://<host-equipo-2>:<puerto>
+   # MODO_SIMULADO=true   # trabajar sin los Equipos 1 y 2 (ver "Clientes de los Equipos 1 y 2")
    ```
 
 2. Levantar los servicios:
@@ -99,6 +100,27 @@ index.html        página del contrato publicada en GitHub Pages
    ```
 
 La API queda publicada en el puerto **8080**. La base de datos no publica puertos: solo se puede llegar a ella desde la red interna `voltrix-reportes-net`.
+
+## Clientes de los Equipos 1 y 2
+
+`app/services/clientes.py` contiene los clientes httpx de Inventario (Equipo 1) y Telemetría (Equipo 2). Cada llamada envía `X-Equipo-Consumidor: equipo-4` y `X-Request-Id`.
+
+| Variable | Por defecto | Descripción |
+| --- | --- | --- |
+| `INVENTARIO_URL` | (vacía) | URL base del servicio del Equipo 1 |
+| `TELEMETRIA_URL` | (vacía) | URL base del servicio del Equipo 2 |
+| `MODO_SIMULADO` | `false` | Con `true` no se hace ninguna llamada HTTP: se usan datos sintéticos deterministas (6 activos por planta, lecturas cada 15 min) |
+| `CLIENTES_TIMEOUT_S` | `10` | Tiempo máximo de cada llamada |
+| `CLIENTES_REINTENTOS` | `2` | Reintentos si falla la conexión |
+
+Si no es modo simulado y falta una URL, o si un equipo no responde, la API devuelve `502 DEPENDENCIA_FALLIDA`. Uso desde la capa de negocio:
+
+```python
+from app.services.clientes import crear_fuente
+
+with crear_fuente() as fuente:
+    series = fuente.obtener_series(["PL-001"], desde, hasta)   # list[SerieLecturas]
+```
 
 ## Pruebas
 
