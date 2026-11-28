@@ -1,0 +1,4 @@
+Fecha: vie 27/11/2026 23:17:39,29
+
+> docker exec floci-aws-eks-voltrix-reportes crictl images | findstr reportes-api
+000000000000.dkr.ecr.us-east-1.localhost:4566/voltrix/reportes-api   avance2             4761570f5b185       81.8MB

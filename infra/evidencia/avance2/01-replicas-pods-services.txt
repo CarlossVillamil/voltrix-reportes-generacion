@@ -1,0 +1,20 @@
+Fecha: vie 27/11/2026 23:17:24,88
+
+> kubectl get deployments,pods,services -n voltrix-reportes -o wide
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                                                                       SELECTOR
+deployment.apps/api-reportes   2/2     2            2           13m   api          000000000000.dkr.ecr.us-east-1.localhost:4566/voltrix/reportes-api:avance2   app=api-reportes
+deployment.apps/db-reportes    1/1     1            1           13m   postgres     postgres:16-alpine                                                           app=db-reportes
+
+NAME                                READY   STATUS    RESTARTS   AGE   IP          NODE                               NOMINATED NODE   READINESS GATES
+pod/api-reportes-79444cbc44-jqvzt   1/1     Running   0          13m   10.42.0.9   i-517f15ad63d335709.ec2.internal   <none>           <none>
+pod/api-reportes-79444cbc44-k2mtj   1/1     Running   0          13m   10.42.0.8   i-517f15ad63d335709.ec2.internal   <none>           <none>
+pod/db-reportes-5b6c6f58ff-vt8fl    1/1     Running   0          13m   10.42.0.7   i-517f15ad63d335709.ec2.internal   <none>           <none>
+
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/api-reportes   ClusterIP   10.100.117.171   <none>        80/TCP     13m   app=api-reportes
+service/db-reportes    ClusterIP   10.100.231.35    <none>        5432/TCP   19m   app=db-reportes
+
+> kubectl get endpoints api-reportes -n voltrix-reportes
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+NAME           ENDPOINTS                       AGE
+api-reportes   10.42.0.8:8000,10.42.0.9:8000   13m

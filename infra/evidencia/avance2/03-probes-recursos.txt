@@ -1,0 +1,115 @@
+Fecha: vie 27/11/2026 23:17:32,53
+
+> kubectl describe deployment api-reportes -n voltrix-reportes
+Name:                   api-reportes
+Namespace:              voltrix-reportes
+CreationTimestamp:      Fri, 27 Nov 2026 23:04:21 -0500
+Labels:                 app=api-reportes
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=api-reportes
+Replicas:               2 desired | 2 updated | 2 total | 2 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=api-reportes
+  Containers:
+   api:
+    Image:      000000000000.dkr.ecr.us-east-1.localhost:4566/voltrix/reportes-api:avance2
+    Port:       8000/TCP
+    Host Port:  0/TCP
+    Limits:
+      cpu:     1
+      memory:  448Mi
+    Requests:
+      cpu:      250m
+      memory:   256Mi
+    Liveness:   tcp-socket :http delay=0s timeout=1s period=20s #success=1 #failure=3
+    Readiness:  http-get http://:http/health delay=0s timeout=1s period=10s #success=1 #failure=3
+    Startup:    http-get http://:http/health delay=0s timeout=1s period=5s #success=1 #failure=30
+    Environment Variables from:
+      api-reportes-config       ConfigMap  Optional: false
+      db-reportes-credenciales  Secret     Optional: false
+    Environment:                <none>
+    Mounts:                     <none>
+  Volumes:                      <none>
+  Node-Selectors:               <none>
+  Tolerations:                  <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   api-reportes-79444cbc44 (2/2 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  13m   deployment-controller  Scaled up replica set api-reportes-79444cbc44 from 0 to 2
+
+> kubectl describe deployment db-reportes -n voltrix-reportes
+Name:               db-reportes
+Namespace:          voltrix-reportes
+CreationTimestamp:  Fri, 27 Nov 2026 23:03:55 -0500
+Labels:             app=db-reportes
+Annotations:        deployment.kubernetes.io/revision: 1
+Selector:           app=db-reportes
+Replicas:           1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:       Recreate
+MinReadySeconds:    0
+Pod Template:
+  Labels:  app=db-reportes
+  Containers:
+   postgres:
+    Image:      postgres:16-alpine
+    Port:       5432/TCP
+    Host Port:  0/TCP
+    Args:
+      -c
+      shared_buffers=48MB
+      -c
+      effective_cache_size=128MB
+      -c
+      work_mem=2MB
+      -c
+      maintenance_work_mem=16MB
+      -c
+      max_connections=20
+    Limits:
+      cpu:     500m
+      memory:  256Mi
+    Requests:
+      cpu:      100m
+      memory:   128Mi
+    Liveness:   exec [sh -c pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d reportes] delay=30s timeout=1s period=20s #success=1 #failure=3
+    Readiness:  exec [sh -c pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d reportes] delay=5s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      POSTGRES_DB:        reportes
+      POSTGRES_USER:      <set to the key 'DB_USER' in secret 'db-reportes-credenciales'>      Optional: false
+      POSTGRES_PASSWORD:  <set to the key 'DB_PASSWORD' in secret 'db-reportes-credenciales'>  Optional: false
+      PGDATA:             /var/lib/postgresql/data/pgdata
+    Mounts:
+      /docker-entrypoint-initdb.d from init-sql (ro)
+      /var/lib/postgresql/data from datos (rw)
+  Volumes:
+   datos:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  db-reportes-datos
+    ReadOnly:   false
+   init-sql:
+    Type:          ConfigMap (a volume populated by a ConfigMap)
+    Name:          db-reportes-init
+    Optional:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   db-reportes-5b6c6f58ff (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  13m   deployment-controller  Scaled up replica set db-reportes-5b6c6f58ff from 0 to 1
