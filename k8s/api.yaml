@@ -1,0 +1,74 @@
+# API de reportes: 2 replicas, probes sobre /health y Service interno
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-reportes
+  namespace: voltrix-reportes
+  labels:
+    app: api-reportes
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-reportes
+  template:
+    metadata:
+      labels:
+        app: api-reportes
+    spec:
+      containers:
+        - name: api
+          # Cargada en el nodo con infra/floci/cargar-imagen.cmd
+          image: 000000000000.dkr.ecr.us-east-1.localhost:4566/voltrix/reportes-api:avance2
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-reportes-config
+            - secretRef:
+                name: db-reportes-credenciales
+          # Mismo limite de memoria que en la EC2
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 448Mi
+          # Arranque: hasta 2,5 min esperando a la base
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          # Si la base no responde, /health da 503 y el pod sale del balanceo
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          # Reinicia solo si el proceso se cuelga, no porque falle la base
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3
+---
+# Reparte las peticiones entre las 2 replicas
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-reportes
+  namespace: voltrix-reportes
+spec:
+  type: ClusterIP
+  selector:
+    app: api-reportes
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
