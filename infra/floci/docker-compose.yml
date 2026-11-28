@@ -14,6 +14,8 @@ services:
       # Estado local del emulador (no se sube)
       - ./data:/app/data
     environment:
+      # Guardar el estado en ./data para que el cluster sobreviva a reinicios
+      FLOCI_STORAGE_MODE: hybrid
       # Memoria maxima del nodo k3s (MiB)
       FLOCI_SERVICES_EKS_MAX_MEMORY_MIB: "3072"
       # Rango de puertos del API server de k3s
