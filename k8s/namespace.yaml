@@ -1,0 +1,7 @@
+# Namespace del servicio de reportes (Equipo 4)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: voltrix-reportes
+  labels:
+    equipo: equipo-4
