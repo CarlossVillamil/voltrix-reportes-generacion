@@ -19,3 +19,6 @@ infra/floci/llave-k8s.txt
 *.tfstate.*
 *.tfvars
 crash.log
+
+# Credenciales reales de Kubernetes (se sube solo secret.example.yaml)
+k8s/secret.yaml
