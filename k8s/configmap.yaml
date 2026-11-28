@@ -1,0 +1,16 @@
+# Configuracion no secreta de la API
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-reportes-config
+  namespace: voltrix-reportes
+data:
+  # Sin URLs reales de los Equipos 1 y 2: datos sinteticos
+  MODO_SIMULADO: "true"
+  INVENTARIO_URL: ""
+  TELEMETRIA_URL: ""
+  # Procesos del Map-Reduce por pod
+  MAX_WORKERS: "2"
+  # 5 conexiones por pod x 2 replicas = 10 de las 20 que acepta PostgreSQL
+  DB_POOL_SIZE: "5"
+  LOG_LEVEL: "INFO"

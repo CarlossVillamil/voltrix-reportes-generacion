@@ -1,0 +1,7 @@
+Fecha: vie 27/11/2026 23:17:35,54
+
+> GET http://api-reportes/health
+{"estado":"disponible","baseDatos":"ok","version":"1.0.0","tiempoActivoSeg":793}
+
+> GET http://api-reportes/reportes/generacion?plantaId=PL-001&limit=2  [X-Equipo-Consumidor: equipo-5]
+{"datos":[{"plantaId":"PL-001","activoId":null,"tipoActivo":null,"granularidad":"dia","periodoInicio":"2026-11-01T05:00:00Z","periodoFin":"2026-11-02T05:00:00Z","energiaKwh":2096.4,"potenciaPromedioKw":87.35,"potenciaMaximaKw":237.5,"numeroLecturas":960,"capacidadNominalKw":250.0,"factorPlanta":0.3494,"generadoEn":"2026-11-28T04:04:20.020581Z"},{"plantaId":"PL-001","activoId":null,"tipoActivo":null,"granularidad":"dia","periodoInicio":"2026-11-02T05:00:00Z","periodoFin":"2026-11-03T05:00:00Z","energiaKwh":1807.2,"potenciaPromedioKw":75.3,"potenciaMaximaKw":210.84,"numeroLecturas":960,"capacidadNominalKw":250.0,"factorPlanta":0.3012,"generadoEn":"2026-11-28T04:04:20.020581Z"}],"total":14,"limit":2,"offset":0}
