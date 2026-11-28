@@ -31,8 +31,12 @@ if errorlevel 1 aws iam create-role --role-name eks-cluster-role --assume-role-p
 
 rem Usuario y llave para kubectl (Floci no acepta test/test)
 echo [4/6] Usuario equipo4-k8s
+rem Si el usuario no existia, la llave guardada ya no sirve
 aws iam get-user --user-name equipo4-k8s --profile floci >nul 2>&1
-if errorlevel 1 aws iam create-user --user-name equipo4-k8s --profile floci >nul
+if errorlevel 1 (
+  aws iam create-user --user-name equipo4-k8s --profile floci >nul
+  if exist llave-k8s.txt del llave-k8s.txt
+)
 if not exist llave-k8s.txt (
   aws iam create-access-key --user-name equipo4-k8s --query "AccessKey.[AccessKeyId,SecretAccessKey]" --output text --profile floci > llave-k8s.txt
 )
