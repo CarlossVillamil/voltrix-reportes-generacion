@@ -1,0 +1,138 @@
+# PostgreSQL del servicio: volumen persistente, 1 replica y Service interno
+#
+# Disco en el nodo para PostgreSQL. Floci no trae StorageClass, asi que el
+# volumen se define a mano (en EKS real seria un volumen EBS gp3)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-reportes-datos-pv
+  labels:
+    app: db-reportes
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  # Retain: si se borra el PVC, los datos se conservan
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /var/lib/voltrix/db-reportes
+    type: DirectoryOrCreate
+---
+# Reclamo del volumen de arriba (storageClassName vacio = sin aprovisionador)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-reportes-datos
+  namespace: voltrix-reportes
+spec:
+  storageClassName: ""
+  selector:
+    matchLabels:
+      app: db-reportes
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-reportes
+  namespace: voltrix-reportes
+  labels:
+    app: db-reportes
+spec:
+  replicas: 1
+  # Recreate: el volumen solo admite un pod a la vez
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-reportes
+  template:
+    metadata:
+      labels:
+        app: db-reportes
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          # Mismos ajustes de poca memoria que en la EC2
+          args:
+            - -c
+            - shared_buffers=48MB
+            - -c
+            - effective_cache_size=128MB
+            - -c
+            - work_mem=2MB
+            - -c
+            - maintenance_work_mem=16MB
+            - -c
+            - max_connections=20
+          env:
+            - name: POSTGRES_DB
+              value: reportes
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-reportes-credenciales
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-reportes-credenciales
+                  key: DB_PASSWORD
+            # Subcarpeta vacia para que PostgreSQL inicialice sin problemas
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          # Por TCP: asi no da "listo" mientras corre init.sql
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -h 127.0.0.1 -U \"$POSTGRES_USER\" -d reportes"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -h 127.0.0.1 -U \"$POSTGRES_USER\" -d reportes"]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: datos
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+      volumes:
+        - name: datos
+          persistentVolumeClaim:
+            claimName: db-reportes-datos
+        # Lo crea desplegar.cmd a partir de db/init.sql
+        - name: init-sql
+          configMap:
+            name: db-reportes-init
+---
+# Solo dentro del cluster, como en docker-compose
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-reportes
+  namespace: voltrix-reportes
+spec:
+  type: ClusterIP
+  selector:
+    app: db-reportes
+  ports:
+    - port: 5432
+      targetPort: 5432
